@@ -5,7 +5,7 @@ It provides functionality to create strong passwords with or without special cha
 
 
 # Usage
-./keyVault.sh <website_name> [options]
+./keyVault.sh [options] <website_name> 
 
 
 
