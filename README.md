@@ -17,6 +17,10 @@ It provides functionality to create strong passwords with or without special cha
 
 -d: Delete password with the given file
 
+-l: List all stored passwords
+
+-u: Update an existing password
+
 -h: Display the help menu.
 
 
