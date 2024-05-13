@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Set default values
 vaultName="KeyVault"
 include_special_characters=false
 
