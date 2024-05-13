@@ -7,7 +7,9 @@ It provides functionality to create strong passwords with or without special cha
 
 # Options
 -s: Search for the password in the Vault.
+
 -c: Include special characters in the generated password.
+
 -h: Display the help menu.
 
 # Notes
