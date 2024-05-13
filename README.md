@@ -22,7 +22,7 @@ It provides functionality to create strong passwords with or without special cha
 
 
 # Notes
-The vault directory (.KeyVault) is created in the current working directory if it doesn't already exist.
+The vault directory (KeyVault) is created in the current working directory if it doesn't already exist.
 
 The script assumes that the user has the necessary permissions to create and modify files in the vault directory.
 
