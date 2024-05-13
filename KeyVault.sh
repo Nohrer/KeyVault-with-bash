@@ -16,7 +16,7 @@ generate_password_no_special_characters() {
 
 # Function to show password for a given website name
 show_password() {
-    local fileS=$(sudo find "$vaultName" -type f -name "$websiteName.txt")
+    local fileS=$(find "$vaultName" -type f -name "$websiteName.txt")
     if [ -z "$fileS" ]; then
         echo "Password for '$websiteName' not found."
         exit 1
@@ -27,21 +27,22 @@ show_password() {
 
 # Function to check if a file already exists
 check_existence() {
-    local fileSearch=$(sudo find "$vaultName" -type f -name "$websiteName.txt")
+    local fileSearch=$(find "$vaultName" -type f -name "$websiteName.txt")
     if [ ! -z "$fileSearch" ]; then
         echo "A file with name '$websiteName' already exists."
         exit 1
     fi
 }
 
+# Function to delete a password file
 delete_password(){
-    local fileSearch=$(sudo find "$vaultName" -type f -name "$websiteName.txt")
+    local fileSearch=$(find "$vaultName" -type f -name "$websiteName.txt")
     if [ ! -z "$fileSearch" ]; then
         echo "Are you sure you want to delete this file [$fileSearch]"
         read -p "Y/n: " response
         case "$response" in
             [yY])
-                sudo rm "$fileSearch"
+                rm "$fileSearch"
                 echo "Deleting file..."
                 exit 0
                 ;;
@@ -56,6 +57,35 @@ delete_password(){
     fi
 }
 
+# Function to list all stored passwords
+list_passwords() {
+    echo "Stored Passwords:"
+    find "$vaultName" -type f -exec basename {} \;
+    exit 0
+}
+
+# Function to update an existing password
+update_password() {
+    local fileSearch=$(find "$vaultName" -type f -name "$websiteName.txt")
+    if [ -z "$fileSearch" ]; then
+        echo "Password for '$websiteName' not found."
+        exit 1
+    fi
+    pass=$(cat "$fileSearch")
+    echo "old password : $pass"
+    echo "Updating password for '$websiteName'"
+    # Generate new password
+    if [ "$include_special_characters" = true ]; then
+        password="$(generate_password_special_characters)"
+    else
+        password="$(generate_password_no_special_characters)"
+    fi
+    # Store new password
+    echo "$password" > "$fileSearch"
+    echo "new password $password"
+    echo "Password updated."
+    exit 0
+}
 
 # Help menu
 print_help() {
@@ -64,39 +94,45 @@ print_help() {
     echo "  -s         Show password for the given website name"
     echo "  -c         Include special characters in the generated password"
     echo "  -d         Delete password file from the vault"
+    echo "  -l         List all stored passwords"
+    echo "  -u         Update an existing password"
     echo "  -h         Display this help menu"
 }
 
-# Check if a website name is provided
-
+# Check if the vault directory exists, if not create it
 if [ ! -d "$vaultName" ]; then
     mkdir -p "$vaultName"
 fi
     
 # Parse command-line options
-while getopts "schd" opt; do
+while getopts "s:cd:lhu:" opt; do
     case $opt in
         s)
-            shift
-            websiteName="$1"
+            websiteName="$OPTARG"
             show_password
             exit 0
             ;;
         c)
             include_special_characters=true
-            shift
             ;;
-        h)
-            print_help
-            shift
-            exit 0
-            ;; 
         d)
-            shift
-            websiteName="$1"
+            websiteName="$OPTARG"
             delete_password
             exit 0
             ;;
+        l)
+            list_passwords
+            exit 0
+            ;;
+        u)
+            websiteName="$OPTARG"
+            update_password
+            exit 0
+            ;;
+        h)
+            print_help
+            exit 0
+            ;; 
         \?)
             echo "Invalid option: -$OPTARG"
             print_help
@@ -105,11 +141,12 @@ while getopts "schd" opt; do
     esac
 done
 
+shift $((OPTIND - 1))
+
 if [ -z "$1" ]; then
     print_help
     exit 1
 fi
-
 
 websiteName="$1"
 # Generate password
@@ -123,7 +160,6 @@ fi
 file="$vaultName/$websiteName.txt"
 
 check_existence
-
 
 touch "$file"
 echo "$password" >> "$file"
