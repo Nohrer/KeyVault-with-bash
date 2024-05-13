@@ -15,6 +15,8 @@ It provides functionality to create strong passwords with or without special cha
 
 -c: Include special characters in the generated password.
 
+-d: Delete password with the given file
+
 -h: Display the help menu.
 
 
